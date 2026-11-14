@@ -1,0 +1,599 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local Lighting = game:GetService("Lighting")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
+
+pcall(function()
+    if CoreGui:FindFirstChild("DeltaESPHub") then
+        CoreGui.DeltaESPHub:Destroy()
+    end
+end)
+
+local ESPConfig = {
+    Enabled = true,
+    Box = false,
+    Line = false,
+    Skeleton = false,
+    Spin = false,
+    DisplayPC = false,
+    ColorName = "Merah",
+    Color = Color3.fromRGB(255, 0, 0),
+    Size = 2
+}
+
+local actualColors = {
+    {"Merah", Color3.fromRGB(255, 0, 0)},
+    {"Merah Tua", Color3.fromRGB(139, 0, 0)},
+    {"Merah Muda", Color3.fromRGB(255, 192, 203)},
+    {"Jingga", Color3.fromRGB(255, 165, 0)},
+    {"Kuning", Color3.fromRGB(255, 255, 0)},
+    {"Hijau", Color3.fromRGB(0, 255, 0)},
+    {"Hijau Muda", Color3.fromRGB(144, 238, 144)},
+    {"Hijau Tua", Color3.fromRGB(0, 100, 0)},
+    {"Cyan", Color3.fromRGB(0, 255, 255)},
+    {"Biru Muda", Color3.fromRGB(173, 216, 230)},
+    {"Biru", Color3.fromRGB(0, 0, 255)},
+    {"Biru Tua", Color3.fromRGB(0, 0, 139)},
+    {"Ungu", Color3.fromRGB(128, 0, 128)},
+    {"Ungu Muda", Color3.fromRGB(216, 191, 216)},
+    {"Magenta", Color3.fromRGB(255, 0, 255)},
+    {"Pink", Color3.fromRGB(255, 105, 180)},
+    {"Cokelat", Color3.fromRGB(165, 42, 42)},
+    {"Abu-abu", Color3.fromRGB(128, 128, 128)},
+    {"Hitam", Color3.fromRGB(0, 0, 0)},
+    {"Putih", Color3.fromRGB(255, 255, 255)},
+    {"Emas", Color3.fromRGB(255, 215, 0)},
+    {"Perak", Color3.fromRGB(192, 192, 192)},
+    {"Lime", Color3.fromRGB(50, 205, 50)},
+    {"Teal", Color3.fromRGB(0, 128, 128)},
+    {"Navy", Color3.fromRGB(0, 0, 128)},
+    {"Maroon", Color3.fromRGB(128, 0, 0)},
+    {"Olive", Color3.fromRGB(128, 128, 0)},
+    {"Turquoise", Color3.fromRGB(64, 224, 208)},
+    {"Violet", Color3.fromRGB(238, 130, 238)},
+    {"Indigo", Color3.fromRGB(75, 0, 130)},
+    {"Lavender", Color3.fromRGB(230, 230, 250)},
+    {"Beige", Color3.fromRGB(245, 245, 220)},
+    {"Cream", Color3.fromRGB(255, 253, 208)},
+    {"Orange", Color3.fromRGB(255, 140, 0)},
+    {"Coral", Color3.fromRGB(255, 127, 80)},
+    {"Gold", Color3.fromRGB(255, 215, 0)},
+    {"Silver", Color3.fromRGB(192, 192, 192)},
+    {"Rainbow", "Rainbow"}
+}
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DeltaESPHub"
+pcall(function() ScreenGui.Parent = CoreGui end)
+if not ScreenGui.Parent then ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 200, 0, 340)
+MainFrame.Position = UDim2.new(0.05, 0, 0.2, 0)
+MainFrame.BackgroundColor3 = Color3.fromRGB(12, 10, 18)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
+
+local BgImage = Instance.new("ImageLabel")
+BgImage.Size = UDim2.new(1, 0, 1, 0)
+BgImage.BackgroundTransparency = 1
+BgImage.Image = "rbxassetid://133632303625199"
+BgImage.ScaleType = Enum.ScaleType.Slice
+BgImage.SliceCenter = Rect.new(100, 100, 100, 100)
+BgImage.ImageTransparency = 0.2
+BgImage.ZIndex = 0
+BgImage.Parent = MainFrame
+
+local UIStroke = Instance.new("UIStroke")
+UIStroke.Color = Color3.fromRGB(140, 40, 220)
+UIStroke.Thickness = 2
+UIStroke.Parent = MainFrame
+
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 42)
+TitleBar.BackgroundColor3 = Color3.fromRGB(35, 15, 55)
+TitleBar.BackgroundTransparency = 0.2
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainFrame
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 10)
+TitleCorner.Parent = TitleBar
+
+local TitleFix = Instance.new("Frame")
+TitleFix.Size = UDim2.new(1, 0, 0, 10)
+TitleFix.Position = UDim2.new(0, 0, 1, -10)
+TitleFix.BackgroundColor3 = Color3.fromRGB(35, 15, 55)
+TitleFix.BackgroundTransparency = 0.2
+TitleFix.BorderSizePixel = 0
+TitleFix.Parent = TitleBar
+
+local TitleBanner = Instance.new("ImageLabel")
+TitleBanner.Size = UDim2.new(0.92, 0, 0.88, 0)
+TitleBanner.Position = UDim2.new(0.5, 0, 0.5, 0)
+TitleBanner.AnchorPoint = Vector2.new(0.5, 0.5)
+TitleBanner.BackgroundTransparency = 1
+TitleBanner.Image = "rbxassetid://135793173489766"
+TitleBanner.ScaleType = Enum.ScaleType.Fit
+TitleBanner.Parent = TitleBar
+
+local ScrollingFrame = Instance.new("ScrollingFrame")
+ScrollingFrame.Size = UDim2.new(1, -8, 1, -48)
+ScrollingFrame.Position = UDim2.new(0, 4, 0, 44)
+ScrollingFrame.BackgroundTransparency = 1
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 800)
+ScrollingFrame.ScrollBarThickness = 3
+ScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(140, 40, 220)
+ScrollingFrame.Parent = MainFrame
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 6)
+UIListLayout.Parent = ScrollingFrame
+
+local function createToggle(name, default, callback)
+    local container = Instance.new("TextButton")
+    container.Size = UDim2.new(1, -6, 0, 28)
+    container.BackgroundColor3 = Color3.fromRGB(22, 18, 30)
+    container.BackgroundTransparency = 0.3
+    container.AutoButtonColor = false
+    container.Text = ""
+    container.Parent = ScrollingFrame
+    
+    local cCorner = Instance.new("UICorner")
+    cCorner.CornerRadius = UDim.new(0, 6)
+    cCorner.Parent = container
+    
+    local cStroke = Instance.new("UIStroke")
+    cStroke.Color = Color3.fromRGB(50, 40, 70)
+    cStroke.Thickness = 1
+    cStroke.Parent = container
+    
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -45, 1, 0)
+    label.Position = UDim2.new(0, 8, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = name
+    label.TextColor3 = Color3.fromRGB(240, 240, 255)
+    label.TextSize = 11
+    label.Font = Enum.Font.GothamSemibold
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.TextStrokeTransparency = 0
+    label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    label.Parent = container
+    
+    local switchBg = Instance.new("Frame")
+    switchBg.Size = UDim2.new(0, 32, 0, 16)
+    switchBg.Position = UDim2.new(1, -38, 0.5, -8)
+    switchBg.BackgroundColor3 = default and Color3.fromRGB(140, 40, 220) or Color3.fromRGB(40, 35, 50)
+    switchBg.BorderSizePixel = 0
+    switchBg.Parent = container
+    
+    local sbCorner = Instance.new("UICorner")
+    sbCorner.CornerRadius = UDim.new(1, 0)
+    sbCorner.Parent = switchBg
+    
+    local switchKnob = Instance.new("Frame")
+    switchKnob.Size = UDim2.new(0, 12, 0, 12)
+    switchKnob.Position = default and UDim2.new(1, -14, 0.5, -6) or UDim2.new(0, 2, 0.5, -6)
+    switchKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    switchKnob.BorderSizePixel = 0
+    switchKnob.Parent = switchBg
+    
+    local skCorner = Instance.new("UICorner")
+    skCorner.CornerRadius = UDim.new(1, 0)
+    skCorner.Parent = switchKnob
+    
+    local state = default
+    
+    local function toggleAction()
+        state = not state
+        if state then
+            switchBg.BackgroundColor3 = Color3.fromRGB(140, 40, 220)
+            switchKnob:TweenPosition(UDim2.new(1, -14, 0.5, -6), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
+        else
+            switchBg.BackgroundColor3 = Color3.fromRGB(40, 35, 50)
+            switchKnob:TweenPosition(UDim2.new(0, 2, 0.5, -6), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.15, true)
+        end
+        callback(state)
+    end
+    
+    container.MouseButton1Click:Connect(toggleAction)
+end
+
+local function createLabel(text)
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, -6, 0, 20)
+    lbl.BackgroundTransparency = 1
+    lbl.TextColor3 = Color3.fromRGB(200, 130, 255)
+    lbl.TextSize = 11
+    lbl.Font = Enum.Font.GothamBold
+    lbl.Text = text
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.TextStrokeTransparency = 0
+    lbl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    lbl.Parent = ScrollingFrame
+end
+
+createToggle("Master ESP", true, function(v) ESPConfig.Enabled = v end)
+createToggle("ESP Box", false, function(v) ESPConfig.Box = v end)
+createToggle("ESP Line", false, function(v) ESPConfig.Line = v end)
+createToggle("ESP Skeleton", false, function(v) ESPConfig.Skeleton = v end)
+createToggle("Spin 360°", false, function(v) ESPConfig.Spin = v end)
+
+createLabel("--APPEARANCE--")
+
+createToggle("Low Graphics", false, function(v)
+    if v then
+        settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9e9
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            if obj:IsA("BasePart") then
+                obj.Material = Enum.Material.SmoothPlastic
+                obj.Reflectance = 0
+            end
+        end
+    else
+        settings().Rendering.QualityLevel = Enum.QualityLevel.Automatic
+        Lighting.GlobalShadows = true
+    end
+end)
+
+createToggle("FPS Boost", false, function(v)
+    if v then
+        pcall(function() setfpscap(999) end)
+        Workspace.ClientAnimatorThrottling = Enum.ClientAnimatorThrottlingMode.Enabled
+        for _, child in ipairs(Workspace:GetDescendants()) do
+            if child:IsA("ParticleEmitter") or child:IsA("Trail") or child:IsA("Beam") then
+                child.Enabled = false
+            end
+        end
+    else
+        pcall(function() setfpscap(60) end)
+    end
+end)
+
+createToggle("Display PC", false, function(v)
+    ESPConfig.DisplayPC = v
+    if v then
+        Camera.FieldOfView = 90
+    else
+        Camera.FieldOfView = 70
+    end
+end)
+
+createToggle("Preventing Legs", false, function(v)
+    if v then
+        RunService.MemoryUsageChanged:Connect(function()
+            collectgarbage("collect")
+        end)
+        pcall(function()
+            settings().Rendering.EagerBulkExecution = true
+        end)
+    end
+end)
+
+createLabel("COLOR ESP 🟥")
+
+local ColorGrid = Instance.new("Frame")
+ColorGrid.Size = UDim2.new(1, -6, 0, 160)
+ColorGrid.BackgroundColor3 = Color3.fromRGB(16, 12, 22)
+ColorGrid.BackgroundTransparency = 0.3
+ColorGrid.BorderSizePixel = 0
+ColorGrid.Parent = ScrollingFrame
+
+local cgCorner = Instance.new("UICorner")
+cgCorner.CornerRadius = UDim.new(0, 6)
+cgCorner.Parent = ColorGrid
+
+local cgStroke = Instance.new("UIStroke")
+cgStroke.Color = Color3.fromRGB(50, 30, 70)
+cgStroke.Thickness = 1
+cgStroke.Parent = ColorGrid
+
+local UIGrid = Instance.new("UIGridLayout")
+UIGrid.CellSize = UDim2.new(0, 22, 0, 22)
+UIGrid.CellPadding = UDim2.new(0, 5, 0, 5)
+UIGrid.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIGrid.VerticalAlignment = Enum.VerticalAlignment.Center
+UIGrid.Parent = ColorGrid
+
+local activeColorBox = nil
+
+for _, colData in ipairs(actualColors) do
+    local colName = colData[1]
+    local colVal = colData[2]
+    
+    local colorBtn = Instance.new("TextButton")
+    colorBtn.Size = UDim2.new(0, 22, 0, 22)
+    colorBtn.BackgroundColor3 = (colVal == "Rainbow") and Color3.fromRGB(255, 255, 255) or colVal
+    colorBtn.Text = ""
+    colorBtn.AutoButtonColor = false
+    colorBtn.Parent = ColorGrid
+    
+    local cbCorner = Instance.new("UICorner")
+    cbCorner.CornerRadius = UDim.new(0, 5)
+    cbCorner.Parent = colorBtn
+    
+    local cbStroke = Instance.new("UIStroke")
+    cbStroke.Color = (colName == "Merah") and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(50, 30, 70)
+    cbStroke.Thickness = (colName == "Merah") and 2 or 1
+    cbStroke.Parent = colorBtn
+    
+    if colName == "Rainbow" then
+        local rbGradient = Instance.new("UIGradient")
+        rbGradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+            ColorSequenceKeypoint.new(0.2, Color3.fromRGB(255, 255, 0)),
+            ColorSequenceKeypoint.new(0.4, Color3.fromRGB(0, 255, 0)),
+            ColorSequenceKeypoint.new(0.6, Color3.fromRGB(0, 255, 255)),
+            ColorSequenceKeypoint.new(0.8, Color3.fromRGB(0, 0, 255)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 255))
+        })
+        rbGradient.Parent = colorBtn
+    end
+    
+    if colName == "Merah" then
+        activeColorBox = cbStroke
+    end
+    
+    colorBtn.MouseButton1Click:Connect(function()
+        if activeColorBox then
+            activeColorBox.Color = Color3.fromRGB(50, 30, 70)
+            activeColorBox.Thickness = 1
+        end
+        activeColorBox = cbStroke
+        cbStroke.Color = Color3.fromRGB(255, 255, 255)
+        cbStroke.Thickness = 2
+        
+        ESPConfig.ColorName = colName
+        ESPConfig.Color = colVal
+    end)
+end
+
+createLabel("[ Size Esp ]")
+
+local SizeContainer = Instance.new("Frame")
+SizeContainer.Size = UDim2.new(1, -6, 0, 30)
+SizeContainer.BackgroundTransparency = 1
+SizeContainer.Parent = ScrollingFrame
+
+local sizeLayout = Instance.new("UIListLayout")
+sizeLayout.FillDirection = Enum.FillDirection.Horizontal
+sizeLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+sizeLayout.Padding = UDim.new(0, 6)
+sizeLayout.Parent = SizeContainer
+
+local activeSizeBtn = nil
+
+for i = 1, 4 do
+    local sizeBtn = Instance.new("TextButton")
+    sizeBtn.Size = UDim2.new(0, 38, 0, 28)
+    sizeBtn.BackgroundColor3 = (i == 2) and Color3.fromRGB(75, 25, 120) or Color3.fromRGB(24, 18, 32)
+    sizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    sizeBtn.TextSize = 11
+    sizeBtn.Font = Enum.Font.GothamBold
+    sizeBtn.Text = tostring(i)
+    sizeBtn.TextStrokeTransparency = 0
+    sizeBtn.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    sizeBtn.Parent = SizeContainer
+    
+    local sc = Instance.new("UICorner")
+    sc.CornerRadius = UDim.new(0, 6)
+    sc.Parent = sizeBtn
+    
+    local sStroke = Instance.new("UIStroke")
+    sStroke.Color = (i == 2) and Color3.fromRGB(180, 80, 255) or Color3.fromRGB(50, 40, 70)
+    sStroke.Thickness = 1
+    sStroke.Parent = sizeBtn
+    
+    if i == 2 then
+        activeSizeBtn = sizeBtn
+    end
+    
+    sizeBtn.MouseButton1Click:Connect(function()
+        ESPConfig.Size = i
+        if activeSizeBtn then
+            activeSizeBtn.BackgroundColor3 = Color3.fromRGB(24, 18, 32)
+            activeSizeBtn:FindFirstChildOfClass("UIStroke").Color = Color3.fromRGB(50, 40, 70)
+        end
+        activeSizeBtn = sizeBtn
+        sizeBtn.BackgroundColor3 = Color3.fromRGB(75, 25, 120)
+        sStroke.Color = Color3.fromRGB(180, 80, 255)
+    end)
+end
+
+local ESPInstances = {}
+
+local function removeESP(player)
+    if ESPInstances[player] then
+        for _, obj in pairs(ESPInstances[player]) do
+            pcall(function() 
+                if typeof(obj) == "table" then
+                    for _, line in pairs(obj) do
+                        pcall(function() line:Remove() end)
+                    end
+                else
+                    obj:Remove() 
+                end
+            end)
+        end
+        ESPInstances[player] = nil
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    local currentColor = ESPConfig.Color
+    if currentColor == "Rainbow" then
+        currentColor = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+    end
+
+    if ESPConfig.DisplayPC then
+        Camera.FieldOfView = 90
+    end
+
+    local char = LocalPlayer.Character
+    local rootPart = char and char:FindFirstChild("HumanoidRootPart")
+    if ESPConfig.Spin and rootPart then
+        local currentCFrame = rootPart.CFrame
+        rootPart.CFrame = currentCFrame * CFrame.Angles(0, math.rad(50), 0)
+    end
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            if not ESPInstances[player] then
+                pcall(function()
+                    ESPInstances[player] = {
+                        Box = Drawing.new("Square"),
+                        Line = Drawing.new("Line"),
+                        Skeleton = {
+                            Head_Neck = Drawing.new("Line"),
+                            Neck_Spine = Drawing.new("Line"),
+                            Spine_Root = Drawing.new("Line"),
+                            LeftShoulder = Drawing.new("Line"),
+                            LeftArm = Drawing.new("Line"),
+                            LeftHand = Drawing.new("Line"),
+                            RightShoulder = Drawing.new("Line"),
+                            RightArm = Drawing.new("Line"),
+                            RightHand = Drawing.new("Line"),
+                            LeftHip = Drawing.new("Line"),
+                            LeftLeg = Drawing.new("Line"),
+                            LeftFoot = Drawing.new("Line"),
+                            RightHip = Drawing.new("Line"),
+                            RightLeg = Drawing.new("Line"),
+                            RightFoot = Drawing.new("Line")
+                        }
+                    }
+                    ESPInstances[player].Box.Filled = false
+                end)
+            end
+            
+            local esp = ESPInstances[player]
+            if esp then
+                local character = player.Character
+                local hrp = character and character:FindFirstChild("HumanoidRootPart")
+                local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+                
+                if ESPConfig.Enabled and character and hrp and humanoid and humanoid.Health > 0 then
+                    local vector, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+                    
+                    if onScreen then
+                        local head = character:FindFirstChild("Head")
+                        local upperTorso = character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso")
+                        local lowerTorso = character:FindFirstChild("LowerTorso") or upperTorso
+                        local humanoidRootPart = hrp
+                        
+                        local lArm1 = character:FindFirstChild("LeftUpperArm") or character:FindFirstChild("Left Arm")
+                        local lArm2 = character:FindFirstChild("LeftLowerArm") or lArm1
+                        local lArm3 = character:FindFirstChild("LeftHand") or lArm2
+                        
+                        local rArm1 = character:FindFirstChild("RightUpperArm") or character:FindFirstChild("Right Arm")
+                        local rArm2 = character:FindFirstChild("RightLowerArm") or rArm1
+                        local rArm3 = character:FindFirstChild("RightHand") or rArm2
+                        
+                        local lLeg1 = character:FindFirstChild("LeftUpperLeg") or character:FindFirstChild("Left Leg")
+                        local lLeg2 = character:FindFirstChild("LeftLowerLeg") or lLeg1
+                        local lLeg3 = character:FindFirstChild("LeftFoot") or lLeg2
+                        
+                        local rLeg1 = character:FindFirstChild("RightUpperLeg") or character:FindFirstChild("Right Leg")
+                        local rLeg2 = character:FindFirstChild("RightLowerLeg") or rLeg1
+                        local rLeg3 = character:FindFirstChild("RightFoot") or rLeg2
+
+                        local topPos = head and Camera:WorldToViewportPoint(head.Position + Vector3.new(0, 0.5, 0)) or vector
+                        local legPos = Camera:WorldToViewportPoint(hrp.Position - Vector3.new(0, 3, 0))
+                        
+                        local height = math.abs(topPos.Y - legPos.Y)
+                        local width = height / 2
+                        local boxPos = Vector2.new(vector.X - width / 2, topPos.Y)
+                        
+                        if ESPConfig.Box then
+                            esp.Box.Visible = true
+                            esp.Box.Size = Vector2.new(width, height)
+                            esp.Box.Position = boxPos
+                            esp.Box.Color = currentColor
+                            esp.Box.Thickness = ESPConfig.Size
+                        else
+                            esp.Box.Visible = false
+                        end
+                        
+                        if ESPConfig.Line then
+                            esp.Line.Visible = true
+                            esp.Line.From = Vector2.new(Camera.ViewportSize.X / 2, 0)
+                            esp.Line.To = Vector2.new(boxPos.X + (width / 2), boxPos.Y)
+                            esp.Line.Color = currentColor
+                            esp.Line.Thickness = ESPConfig.Size
+                        else
+                            esp.Line.Visible = false
+                        end
+
+                        if ESPConfig.Skeleton and head and upperTorso then
+                            local function drawBone(boneObj, partA, partB)
+                                if partA and partB then
+                                    local posA, visA = Camera:WorldToViewportPoint(partA.Position)
+                                    local posB, visB = Camera:WorldToViewportPoint(partB.Position)
+                                    if visA or visB then
+                                        boneObj.Visible = true
+                                        boneObj.From = Vector2.new(posA.X, posA.Y)
+                                        boneObj.To = Vector2.new(posB.X, posB.Y)
+                                        boneObj.Color = Color3.fromRGB(255, 255, 255)
+                                        boneObj.Thickness = ESPConfig.Size
+                                        return
+                                    end
+                                end
+                                boneObj.Visible = false
+                            end
+
+                            drawBone(esp.Skeleton.Head_Neck, head, upperTorso)
+                            drawBone(esp.Skeleton.Neck_Spine, upperTorso, lowerTorso)
+                            drawBone(esp.Skeleton.Spine_Root, lowerTorso, humanoidRootPart)
+
+                            drawBone(esp.Skeleton.LeftShoulder, upperTorso, lArm1)
+                            drawBone(esp.Skeleton.LeftArm, lArm1, lArm2)
+                            drawBone(esp.Skeleton.LeftHand, lArm2, lArm3)
+
+                            drawBone(esp.Skeleton.RightShoulder, upperTorso, rArm1)
+                            drawBone(esp.Skeleton.RightArm, rArm1, rArm2)
+                            drawBone(esp.Skeleton.RightHand, rArm2, rArm3)
+
+                            drawBone(esp.Skeleton.LeftHip, lowerTorso, lLeg1)
+                            drawBone(esp.Skeleton.LeftLeg, lLeg1, lLeg2)
+                            drawBone(esp.Skeleton.LeftFoot, lLeg2, lLeg3)
+
+                            drawBone(esp.Skeleton.RightHip, lowerTorso, rLeg1)
+                            drawBone(esp.Skeleton.RightLeg, rLeg1, rLeg2)
+                            drawBone(esp.Skeleton.RightFoot, rLeg2, rLeg3)
+                        else
+                            for _, bone in pairs(esp.Skeleton) do
+                                bone.Visible = false
+                            end
+                        end
+                    else
+                        esp.Box.Visible = false
+                        esp.Line.Visible = false
+                        for _, bone in pairs(esp.Skeleton) do
+                            bone.Visible = false
+                        end
+                    end
+                else
+                    esp.Box.Visible = false
+                    esp.Line.Visible = false
+                    for _, bone in pairs(esp.Skeleton) do
+                        bone.Visible = false
+                    end
+                end
+            end
+        end
+    end
+end)
