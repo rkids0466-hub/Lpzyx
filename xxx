@@ -434,6 +434,10 @@ local function removeESP(player)
     end
 end
 
+Players.PlayerRemoving:Connect(function(player)
+    removeESP(player)
+end)
+
 RunService.RenderStepped:Connect(function()
     local currentColor = ESPConfig.Color
     if currentColor == "Rainbow" then
@@ -486,6 +490,7 @@ RunService.RenderStepped:Connect(function()
                 local hrp = character and character:FindFirstChild("HumanoidRootPart")
                 local humanoid = character and character:FindFirstChildOfClass("Humanoid")
                 
+                -- Pastikan ESP hanya menyala jika master aktif, karakter ada, hidup, dan berada di dalam layar (onScreen)
                 if ESPConfig.Enabled and character and hrp and humanoid and humanoid.Health > 0 then
                     local vector, onScreen = Camera:WorldToViewportPoint(hrp.Position)
                     
@@ -543,7 +548,7 @@ RunService.RenderStepped:Connect(function()
                                 if partA and partB then
                                     local posA, visA = Camera:WorldToViewportPoint(partA.Position)
                                     local posB, visB = Camera:WorldToViewportPoint(partB.Position)
-                                    if visA or visB then
+                                    if visA and visB then
                                         boneObj.Visible = true
                                         boneObj.From = Vector2.new(posA.X, posA.Y)
                                         boneObj.To = Vector2.new(posB.X, posB.Y)
@@ -580,6 +585,7 @@ RunService.RenderStepped:Connect(function()
                             end
                         end
                     else
+                        -- Sembunyikan semua elemen jika player di luar layar (onScreen = false)
                         esp.Box.Visible = false
                         esp.Line.Visible = false
                         for _, bone in pairs(esp.Skeleton) do
