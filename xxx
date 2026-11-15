@@ -1,9 +1,9 @@
-local Players = game:GetService("Players")
+local LocalPlayers = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local CoreGui = game:GetService("CoreGui")
 local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
-local LocalPlayer = Players.LocalPlayer
+local LocalPlayer = LocalPlayers.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
 pcall(function()
@@ -17,6 +17,7 @@ local ESPConfig = {
     Box = false,
     Line = false,
     Skeleton = false,
+    Health = false,
     Spin = false,
     DisplayPC = false,
     ColorName = "Merah",
@@ -119,19 +120,55 @@ TitleFix.BorderSizePixel = 0
 TitleFix.Parent = TitleBar
 
 local TitleBanner = Instance.new("ImageLabel")
-TitleBanner.Size = UDim2.new(0.92, 0, 0.88, 0)
-TitleBanner.Position = UDim2.new(0.5, 0, 0.5, 0)
+TitleBanner.Size = UDim2.new(0.80, 0, 0.88, 0)
+TitleBanner.Position = UDim2.new(0.44, 0, 0.5, 0)
 TitleBanner.AnchorPoint = Vector2.new(0.5, 0.5)
 TitleBanner.BackgroundTransparency = 1
 TitleBanner.Image = "rbxassetid://135793173489766"
 TitleBanner.ScaleType = Enum.ScaleType.Fit
 TitleBanner.Parent = TitleBar
 
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 26, 0, 26)
+CloseButton.Position = UDim2.new(1, -32, 0.5, -13)
+CloseButton.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 13
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.AutoButtonColor = true
+CloseButton.ZIndex = 5
+CloseButton.Parent = TitleBar
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseButton
+
+local FloatingButton = Instance.new("ImageButton")
+FloatingButton.Size = UDim2.new(0, 55, 0, 55)
+FloatingButton.Position = UDim2.new(0, 20, 0.2, 0)
+FloatingButton.BackgroundTransparency = 1
+FloatingButton.Image = "rbxassetid://121651707544333"
+FloatingButton.Visible = false
+FloatingButton.Active = true
+FloatingButton.Draggable = true
+FloatingButton.Parent = ScreenGui
+
+CloseButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    FloatingButton.Visible = true
+end)
+
+FloatingButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    FloatingButton.Visible = false
+end)
+
 local ScrollingFrame = Instance.new("ScrollingFrame")
 ScrollingFrame.Size = UDim2.new(1, -8, 1, -48)
 ScrollingFrame.Position = UDim2.new(0, 4, 0, 44)
 ScrollingFrame.BackgroundTransparency = 1
-ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 800)
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 900)
 ScrollingFrame.ScrollBarThickness = 3
 ScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(140, 40, 220)
 ScrollingFrame.Parent = MainFrame
@@ -230,6 +267,7 @@ createToggle("Master ESP", true, function(v) ESPConfig.Enabled = v end)
 createToggle("ESP Box", false, function(v) ESPConfig.Box = v end)
 createToggle("ESP Line", false, function(v) ESPConfig.Line = v end)
 createToggle("ESP Skeleton", false, function(v) ESPConfig.Skeleton = v end)
+createToggle("ESP Health", false, function(v) ESPConfig.Health = v end)
 createToggle("Spin 360°", false, function(v) ESPConfig.Spin = v end)
 
 createLabel("--APPEARANCE--")
@@ -255,13 +293,28 @@ createToggle("FPS Boost", false, function(v)
     if v then
         pcall(function() setfpscap(999) end)
         Workspace.ClientAnimatorThrottling = Enum.ClientAnimatorThrottlingMode.Enabled
+        pcall(function()
+            settings().Rendering.EagerBulkExecution = true
+        end)
         for _, child in ipairs(Workspace:GetDescendants()) do
-            if child:IsA("ParticleEmitter") or child:IsA("Trail") or child:IsA("Beam") then
+            if child:IsA("ParticleEmitter") or child:IsA("Trail") or child:IsA("Beam") or child:IsA("Fire") or child:IsA("Smoke") or child:IsA("Sparkles") then
                 child.Enabled = false
+            end
+        end
+        Lighting.GlobalShadows = false
+        Lighting.Brightness = 2
+        Lighting.OutdoorAmbient = Color3.fromRGB(150, 150, 150)
+        Lighting.FogEnd = 9e9
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            if obj:IsA("BasePart") then
+                obj.Material = Enum.Material.SmoothPlastic
+                obj.Reflectance = 0
             end
         end
     else
         pcall(function() setfpscap(60) end)
+        Lighting.GlobalShadows = true
+        Lighting.Brightness = 1
     end
 end)
 
@@ -434,7 +487,7 @@ local function removeESP(player)
     end
 end
 
-Players.PlayerRemoving:Connect(function(player)
+LocalPlayers.PlayerRemoving:Connect(function(player)
     removeESP(player)
 end)
 
@@ -455,13 +508,15 @@ RunService.RenderStepped:Connect(function()
         rootPart.CFrame = currentCFrame * CFrame.Angles(0, math.rad(50), 0)
     end
 
-    for _, player in ipairs(Players:GetPlayers()) do
+    for _, player in ipairs(LocalPlayers:GetPlayers()) do
         if player ~= LocalPlayer then
             if not ESPInstances[player] then
                 pcall(function()
                     ESPInstances[player] = {
                         Box = Drawing.new("Square"),
                         Line = Drawing.new("Line"),
+                        HealthBarBg = Drawing.new("Square"),
+                        HealthBar = Drawing.new("Square"),
                         Skeleton = {
                             Head_Neck = Drawing.new("Line"),
                             Neck_Spine = Drawing.new("Line"),
@@ -481,6 +536,10 @@ RunService.RenderStepped:Connect(function()
                         }
                     }
                     ESPInstances[player].Box.Filled = false
+                    ESPInstances[player].HealthBarBg.Filled = true
+                    ESPInstances[player].HealthBarBg.Color = Color3.fromRGB(0, 0, 0)
+                    ESPInstances[player].HealthBar.Filled = true
+                    ESPInstances[player].HealthBar.Color = Color3.fromRGB(0, 255, 0)
                 end)
             end
             
@@ -490,7 +549,6 @@ RunService.RenderStepped:Connect(function()
                 local hrp = character and character:FindFirstChild("HumanoidRootPart")
                 local humanoid = character and character:FindFirstChildOfClass("Humanoid")
                 
-                -- Pastikan ESP hanya menyala jika master aktif, karakter ada, hidup, dan berada di dalam layar (onScreen)
                 if ESPConfig.Enabled and character and hrp and humanoid and humanoid.Health > 0 then
                     local vector, onScreen = Camera:WorldToViewportPoint(hrp.Position)
                     
@@ -531,6 +589,22 @@ RunService.RenderStepped:Connect(function()
                             esp.Box.Thickness = ESPConfig.Size
                         else
                             esp.Box.Visible = false
+                        end
+                        
+                        if ESPConfig.Health then
+                            local healthPercent = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)
+                            local barHeight = height * healthPercent
+                            
+                            esp.HealthBarBg.Visible = true
+                            esp.HealthBarBg.Size = Vector2.new(3, height)
+                            esp.HealthBarBg.Position = Vector2.new(boxPos.X + width + 3, boxPos.Y)
+                            
+                            esp.HealthBar.Visible = true
+                            esp.HealthBar.Size = Vector2.new(1, barHeight)
+                            esp.HealthBar.Position = Vector2.new(boxPos.X + width + 4, boxPos.Y + (height - barHeight))
+                        else
+                            esp.HealthBarBg.Visible = false
+                            esp.HealthBar.Visible = false
                         end
                         
                         if ESPConfig.Line then
@@ -585,9 +659,10 @@ RunService.RenderStepped:Connect(function()
                             end
                         end
                     else
-                        -- Sembunyikan semua elemen jika player di luar layar (onScreen = false)
                         esp.Box.Visible = false
                         esp.Line.Visible = false
+                        esp.HealthBarBg.Visible = false
+                        esp.HealthBar.Visible = false
                         for _, bone in pairs(esp.Skeleton) do
                             bone.Visible = false
                         end
@@ -595,6 +670,8 @@ RunService.RenderStepped:Connect(function()
                 else
                     esp.Box.Visible = false
                     esp.Line.Visible = false
+                    esp.HealthBarBg.Visible = false
+                    esp.HealthBar.Visible = false
                     for _, bone in pairs(esp.Skeleton) do
                         bone.Visible = false
                     end
