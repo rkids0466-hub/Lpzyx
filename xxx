@@ -14,6 +14,7 @@ end)
 
 local ESPConfig = {
     Enabled = true,
+    NumPlayers = false,
     Box = false,
     Line = false,
     Skeleton = false,
@@ -71,6 +72,44 @@ ScreenGui.Name = "DeltaESPHub"
 pcall(function() ScreenGui.Parent = CoreGui end)
 if not ScreenGui.Parent then ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui") end
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Kotak Ungu (Digeser ke atas sedikit dengan Y = -10)
+local PlayerCountFrame = Instance.new("Frame")
+PlayerCountFrame.Size = UDim2.new(0, 70, 0, 35)
+PlayerCountFrame.Position = UDim2.new(0.5, -35, 0, -10)
+PlayerCountFrame.BackgroundColor3 = Color3.fromRGB(80, 20, 140)
+PlayerCountFrame.BorderSizePixel = 0
+PlayerCountFrame.Visible = false
+PlayerCountFrame.Parent = ScreenGui
+
+local PCFCorner = Instance.new("UICorner")
+PCFCorner.CornerRadius = UDim.new(0, 6)
+PCFCorner.Parent = PlayerCountFrame
+
+local PCFStroke = Instance.new("UIStroke")
+PCFStroke.Color = Color3.fromRGB(180, 80, 255)
+PCFStroke.Thickness = 1.5
+PCFStroke.Parent = PlayerCountFrame
+
+local PCFTextTitle = Instance.new("TextLabel")
+PCFTextTitle.Size = UDim2.new(1, 0, 0, 12)
+PCFTextTitle.Position = UDim2.new(0, 0, 0, 1)
+PCFTextTitle.BackgroundTransparency = 1
+PCFTextTitle.Text = "PLAYERS"
+PCFTextTitle.TextColor3 = Color3.fromRGB(220, 200, 255)
+PCFTextTitle.TextSize = 8
+PCFTextTitle.Font = Enum.Font.GothamBold
+PCFTextTitle.Parent = PlayerCountFrame
+
+local PCFTextCount = Instance.new("TextLabel")
+PCFTextCount.Size = UDim2.new(1, 0, 0, 20)
+PCFTextCount.Position = UDim2.new(0, 0, 0, 13)
+PCFTextCount.BackgroundTransparency = 1
+PCFTextCount.Text = "0"
+PCFTextCount.TextColor3 = Color3.fromRGB(255, 255, 255)
+PCFTextCount.TextSize = 13
+PCFTextCount.Font = Enum.Font.GothamBold
+PCFTextCount.Parent = PlayerCountFrame
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Size = UDim2.new(0, 200, 0, 340)
@@ -168,7 +207,7 @@ local ScrollingFrame = Instance.new("ScrollingFrame")
 ScrollingFrame.Size = UDim2.new(1, -8, 1, -48)
 ScrollingFrame.Position = UDim2.new(0, 4, 0, 44)
 ScrollingFrame.BackgroundTransparency = 1
-ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 900)
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 950)
 ScrollingFrame.ScrollBarThickness = 3
 ScrollingFrame.ScrollBarImageColor3 = Color3.fromRGB(140, 40, 220)
 ScrollingFrame.Parent = MainFrame
@@ -264,6 +303,10 @@ local function createLabel(text)
 end
 
 createToggle("Master ESP", true, function(v) ESPConfig.Enabled = v end)
+createToggle("Number of Players", false, function(v) 
+    ESPConfig.NumPlayers = v
+    PlayerCountFrame.Visible = v
+end)
 createToggle("ESP Box", false, function(v) ESPConfig.Box = v end)
 createToggle("ESP Line", false, function(v) ESPConfig.Line = v end)
 createToggle("ESP Skeleton", false, function(v) ESPConfig.Skeleton = v end)
@@ -508,6 +551,8 @@ RunService.RenderStepped:Connect(function()
         rootPart.CFrame = currentCFrame * CFrame.Angles(0, math.rad(50), 0)
     end
 
+    local activeLineCount = 0
+
     for _, player in ipairs(LocalPlayers:GetPlayers()) do
         if player ~= LocalPlayer then
             if not ESPInstances[player] then
@@ -613,6 +658,8 @@ RunService.RenderStepped:Connect(function()
                             esp.Line.To = Vector2.new(boxPos.X + (width / 2), boxPos.Y)
                             esp.Line.Color = currentColor
                             esp.Line.Thickness = ESPConfig.Size
+                            
+                            activeLineCount = activeLineCount + 1
                         else
                             esp.Line.Visible = false
                         end
@@ -678,5 +725,9 @@ RunService.RenderStepped:Connect(function()
                 end
             end
         end
+    end
+
+    if ESPConfig.NumPlayers then
+        PCFTextCount.Text = tostring(activeLineCount)
     end
 end)
